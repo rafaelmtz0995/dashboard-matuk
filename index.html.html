@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MATUK — Dashboard COSTOS 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  /* ─── Design Tokens — MATUK Brand ──────────────── */
+  :root {
+    --bg-page:    #EEF2F8;
+    --bg-card:    #FFFFFF;
+    --bg-header:  linear-gradient(135deg, #0D1F3C 0%, #1A3660 45%, #1F5BA6 100%);
+    --border:     #D6E0EF;
+    --text-1:     #0D1F3C;
+    --text-2:     #3D5580;
+    --text-3:     #8DA3C0;
+    --shadow-sm:  0 1px 3px rgba(26,54,96,.10), 0 1px 2px rgba(26,54,96,.08);
+    --shadow-md:  0 4px 20px rgba(26,54,96,.14);
+    --radius:     14px;
+    --radius-sm:  8px;
+
+    /* Categorical palette — MATUK brand tones */
+    --c1: #1A3660; /* MATUK Navy     */
+    --c2: #1F5BA6; /* MATUK Blue     */
+    --c3: #059669; /* Emerald        */
+    --c4: #DC2626; /* Alert Red      */
+    --c5: #E8A020; /* MATUK Gold     */
+    --c6: #3D7AB5; /* Steel Blue     */
+    --c7: #64748B; /* Slate          */
+  }
+  [data-theme="dark"] {
+    --bg-page:    #071428;
+    --bg-card:    #0D1F3C;
+    --border:     #1F3860;
+    --text-1:     #E8F0FB;
+    --text-2:     #7BA3CF;
+    --text-3:     #3D5580;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.5);
+    --shadow-md:  0 4px 20px rgba(0,0,0,.6);
+  }
+
+  /* ─── Reset & Base ──────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-1);
+    min-height: 100vh;
+    transition: background .25s, color .25s;
+    background-image: radial-gradient(ellipse at 0% 0%, rgba(26,54,96,.07) 0%, transparent 55%);
+  }
+  /* ─── Header ────────────────────────────────────── */
+  .header {
+    background: var(--bg-header);
+    padding: 28px 32px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left h1 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.3px;
+  }
+  .header-left p {
+    font-size: .85rem;
+    color: rgba(255,255,255,.7);
+    margin-top: 3px;
+  }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .badge {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.25);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+  }
+  .theme-btn {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.25);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: .8rem;
+    font-weight: 600;
+    transition: background .2s;
+  }
+  .theme-btn:hover { background: rgba(255,255,255,.22); }
+
+  /* ─── Layout ────────────────────────────────────── */
+  .page { max-width: 1440px; margin: 0 auto; padding: 28px 24px 48px; }
+  .section-title {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 12px;
+    margin-top: 28px;
+  }
+
+  /* ─── KPI Row ───────────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 14px;
+  }
+  .kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px 16px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .kpi-card.c1::before { background: var(--c1); }
+  .kpi-card.c2::before { background: var(--c2); }
+  .kpi-card.c3::before { background: var(--c3); }
+  .kpi-card.c4::before { background: var(--c4); }
+  .kpi-card.c5::before { background: var(--c5); }
+  .kpi-card.c6::before { background: var(--c6); }
+  .kpi-card.c7::before { background: var(--c7); }
+  .kpi-label {
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--text-1);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .kpi-sub {
+    font-size: .73rem;
+    color: var(--text-3);
+    margin-top: 5px;
+  }
+  .kpi-icon {
+    position: absolute;
+    bottom: 12px; right: 16px;
+    font-size: 1.6rem;
+    opacity: .13;
+  }
+
+  /* ─── Chart Grid ────────────────────────────────── */
+  .chart-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .chart-grid-3 {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 900px) {
+    .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Card ──────────────────────────────────────── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card-title {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--text-1);
+    margin-bottom: 4px;
+  }
+  .card-sub {
+    font-size: .72rem;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+  .chart-wrap { position: relative; }
+
+  /* ─── Table ─────────────────────────────────────── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .78rem;
+  }
+  .data-table thead th {
+    text-align: left;
+    padding: 7px 10px;
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-1);
+  }
+  .data-table tbody tr:last-child td { border-bottom: none; }
+  .data-table tbody tr:hover { background: var(--bg-page); }
+  .data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .data-table .bold { font-weight: 700; }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: .66rem;
+    font-weight: 700;
+  }
+  .pill-blue  { background: #D6E4F5; color: #1A3660; }
+  .pill-purple{ background: #C8D9EF; color: #1F5BA6; }
+  .pill-green { background: #D1FAE5; color: #065F46; }
+  .pill-amber { background: #FEF3C7; color: #92400E; }
+  .pill-red   { background: #FEE2E2; color: #991B1B; }
+  .pill-cyan  { background: #DBEAFE; color: #3D7AB5; }
+  .pill-pink  { background: #E8F0FB; color: #1F5BA6; }
+  [data-theme="dark"] .pill-blue  { background: #1A3660; color: #7BADDF; }
+  [data-theme="dark"] .pill-purple{ background: #0D2A52; color: #5B9BD5; }
+  [data-theme="dark"] .pill-green { background: #064E3B; color: #6EE7B7; }
+  [data-theme="dark"] .pill-amber { background: #451A03; color: #FCD34D; }
+  [data-theme="dark"] .pill-red   { background: #450A0A; color: #FCA5A5; }
+  [data-theme="dark"] .pill-cyan  { background: #0D2A52; color: #7BADDF; }
+  [data-theme="dark"] .pill-pink  { background: #0D1F3C; color: #5B9BD5; }
+
+  /* ─── Mini sparkline bar ────────────────────────── */
+  .spark-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .spark-bar-bg { flex: 1; height: 5px; background: var(--border); border-radius: 99px; }
+  .spark-bar-fill { height: 100%; border-radius: 99px; }
+
+  /* ─── Footer / divider ──────────────────────────── */
+  .divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+  /* ─── Tooltip override (Chart.js) ──────────────── */
+  .chartjs-tooltip {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-1) !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+
+
+  /* ─── Filter Bar ────────────────────────────────── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 14px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .filter-label {
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-3);
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+  .filter-btn {
+    padding: 5px 14px;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-2);
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover {
+    border-color: var(--c2);
+    color: var(--c2);
+    background: rgba(31,91,166,.07);
+  }
+  .filter-btn.active {
+    background: var(--c1);
+    border-color: var(--c1);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(26,54,96,.3);
+  }
+  .period-note {
+    display: none;
+    font-size: .75rem;
+    color: var(--c2);
+    background: rgba(31,91,166,.08);
+    border: 1px solid rgba(31,91,166,.2);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+
+  /* ─── Highlight row ─────────────────────────────── */
+  .row-highlight td { font-weight: 700; background: var(--bg-page); }
+
+  /* ─── Legend manual ─────────────────────────────── */
+  .legend-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: .72rem; color: var(--text-2); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-left" style="display:flex; align-items:center; gap:20px;">
+    <img src="data:image/png;base64,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" alt="MATUK Automation" style="height:52px; border-radius:8px; background:#fff; padding:5px 10px; box-shadow:0 2px 8px rgba(0,0,0,.25);" />
+    <div>
+      <h1>Dashboard de Costos — 2026</h1>
+      <p>Hoja: COSTOS &nbsp;·&nbsp; Período: Nov 2025 – Sep 2026 &nbsp;·&nbsp; Actualizado: Sep 7, 2026</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge">USD + MXN</span>
+    <span class="badge">11 meses</span>
+    <button class="theme-btn" onclick="toggleTheme()">🌙 Oscuro</button>
+  </div>
+</header>
+
+<!-- ═══ PAGE ══════════════════════════════════════════════════════════════ -->
+<main class="page">
+
+  <!-- ─ KPIs GLOBALES ─────────────────────────────────────────────── -->
+  <!-- ─ FILTRO POR MES ─────────────────────────────────────────────── -->
+  <div class="filter-bar">
+    <span class="filter-label">🗓 Filtrar por mes:</span>
+    <button class="filter-btn active" data-month="TODOS" onclick="filterDashboard('TODOS')">Todos</button>
+    <button class="filter-btn" data-month="Nov-25" onclick="filterDashboard('Nov-25')">Nov-25</button>
+    <button class="filter-btn" data-month="Dic-25" onclick="filterDashboard('Dic-25')">Dic-25</button>
+    <button class="filter-btn" data-month="Ene-26" onclick="filterDashboard('Ene-26')">Ene-26</button>
+    <button class="filter-btn" data-month="Feb-26" onclick="filterDashboard('Feb-26')">Feb-26</button>
+    <button class="filter-btn" data-month="Mar-26" onclick="filterDashboard('Mar-26')">Mar-26</button>
+    <button class="filter-btn" data-month="Abr-26" onclick="filterDashboard('Abr-26')">Abr-26</button>
+    <button class="filter-btn" data-month="May-26" onclick="filterDashboard('May-26')">May-26</button>
+    <button class="filter-btn" data-month="Jun-26" onclick="filterDashboard('Jun-26')">Jun-26</button>
+    <button class="filter-btn" data-month="Jul-26" onclick="filterDashboard('Jul-26')">Jul-26</button>
+    <button class="filter-btn" data-month="Ago-26" onclick="filterDashboard('Ago-26')">Ago-26</button>
+    <button class="filter-btn" data-month="Sep-26" onclick="filterDashboard('Sep-26')">Sep-26</button>
+  </div>
+  <div class="period-note" id="period-note"></div>
+
+  <p class="section-title">KPIs Globales</p>
+  <div class="kpi-grid">
+
+    <div class="kpi-card c1">
+      <div class="kpi-label">Total Horas</div>
+      <div class="kpi-value" id="kpi-total-horas">62,499</div>
+      <div class="kpi-sub" id="kpi-sub-horas">hrs USD + MXN</div>
+      <span class="kpi-icon">⏱️</span>
+    </div>
+
+    <div class="kpi-card c3">
+      <div class="kpi-label">Costo Total USD</div>
+      <div class="kpi-value" id="kpi-costo-usd">$2.06M</div>
+      <div class="kpi-sub" id="kpi-sub-costo-usd">Hrs + Perdiem</div>
+      <span class="kpi-icon">💵</span>
+    </div>
+
+    <div class="kpi-card c5">
+      <div class="kpi-label">Costo Total MXN</div>
+      <div class="kpi-value" id="kpi-costo-mxn">$482.6K</div>
+      <div class="kpi-sub" id="kpi-sub-costo-mxn">Hrs MXN</div>
+      <span class="kpi-icon">🇲🇽</span>
+    </div>
+
+    <div class="kpi-card c2">
+      <div class="kpi-label">Clientes Activos</div>
+      <div class="kpi-value">23</div>
+      <div class="kpi-sub">clientes</div>
+      <span class="kpi-icon">🏢</span>
+    </div>
+
+    <div class="kpi-card c6">
+      <div class="kpi-label">Recursos</div>
+      <div class="kpi-value">87</div>
+      <div class="kpi-sub">headcount</div>
+      <span class="kpi-icon">👥</span>
+    </div>
+
+    <div class="kpi-card c7">
+      <div class="kpi-label">Servicios</div>
+      <div class="kpi-value">7</div>
+      <div class="kpi-sub">tipos activos</div>
+      <span class="kpi-icon">🔧</span>
+    </div>
+
+    <div class="kpi-card c4">
+      <div class="kpi-label">Prom. Hrs/Mes</div>
+      <div class="kpi-value" id="kpi-prom-hrs">5,682</div>
+      <div class="kpi-sub" id="kpi-sub-prom-hrs">hrs promedio / mes</div>
+      <span class="kpi-icon">📈</span>
+    </div>
+
+    <div class="kpi-card c1">
+      <div class="kpi-label">Costo Prom/Hr USD</div>
+      <div class="kpi-value">$27.09</div>
+      <div class="kpi-sub">per hour</div>
+      <span class="kpi-icon">💰</span>
+    </div>
+
+    <div class="kpi-card c5">
+      <div class="kpi-label">Costo Prom/Hr MXN</div>
+      <div class="kpi-value">$204.27</div>
+      <div class="kpi-sub">por hora</div>
+      <span class="kpi-icon">💰</span>
+    </div>
+
+    <div class="kpi-card c3">
+      <div class="kpi-label">Mes Pico</div>
+      <div class="kpi-value" id="kpi-mes-pico">Ago-26</div>
+      <div class="kpi-sub" id="kpi-sub-mes-pico">10,012 horas</div>
+      <span class="kpi-icon">🏆</span>
+    </div>
+
+    <div class="kpi-card c2">
+      <div class="kpi-label">Meses Activos</div>
+      <div class="kpi-value" id="kpi-meses-activos">11</div>
+      <div class="kpi-sub" id="kpi-sub-meses-activos">prom 5,682 hrs/mes</div>
+      <span class="kpi-icon">📅</span>
+    </div>
+
+  </div><!-- /kpi-grid -->
+
+  <!-- ─ TABLA MENSUAL COMPLETA ─────────────────────────────────────── -->
+  <p class="section-title" style="margin-top:28px">Resumen Mensual Detallado</p>
+  <div class="card">
+    <div class="card-title">Detalle Mensual USD &amp; MXN</div>
+    <div class="card-sub">Horas, costo de horas, perdiem y total por divisa</div>
+    <div style="overflow-x:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Mes</th>
+            <th colspan="4" style="text-align:center; border-bottom:1px solid var(--border); color:var(--c1)">USD</th>
+            <th colspan="3" style="text-align:center; border-bottom:1px solid var(--border); color:var(--c5)">MXN</th>
+          </tr>
+          <tr>
+            <th class="num">Horas</th>
+            <th class="num">Costo Hrs</th>
+            <th class="num">Perdiem</th>
+            <th class="num">Total</th>
+            <th class="num">Horas</th>
+            <th class="num">Costo Hrs</th>
+            <th class="num">Total</th>
+          </tr>
+        </thead>
+        <tbody id="monthlyTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─ RESUMEN MENSUAL ────────────────────────────────────────────── -->
+  <p class="section-title" style="margin-top:32px">Resumen Mensual</p>
+  <div class="chart-grid-2">
+
+    <!-- Horas mensuales -->
+    <div class="card">
+      <div class="card-title">Horas por Mes</div>
+      <div class="card-sub">USD vs MXN — total acumulado 62,499 hrs</div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="chartMonthlyHours"></canvas>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c1)"></div>Horas USD</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c5)"></div>Horas MXN</div>
+      </div>
+    </div>
+
+    <!-- Costo mensual USD -->
+    <div class="card">
+      <div class="card-title">Costo Total USD por Mes</div>
+      <div class="card-sub">Costo Hrs + Perdiem — total $2,056,901</div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="chartMonthlyCost"></canvas>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c3)"></div>Costo Hrs</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c5)"></div>Perdiem</div>
+      </div>
+    </div>
+
+  </div><!-- /chart-grid-2 -->
+
+  <!-- ─ SERVICIOS + CLIENTES ──────────────────────────────────────── -->
+  <p class="section-title" style="margin-top:28px">Costo por Servicio</p>
+  <div class="chart-grid-3">
+
+    <!-- Donut servicios -->
+    <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div class="card-title">Distribución de Horas por Servicio</div>
+        <div class="card-sub" id="svc-donut-sub">PLC Programming lidera con 41.3% de las horas</div>
+      </div>
+      <div class="chart-wrap" style="height:240px; display:flex; align-items:center; justify-content:center;">
+        <canvas id="chartServiceDonut"></canvas>
+      </div>
+      <div class="legend-row" style="margin-top:8px">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c1)"></div>ELECTROMEC.</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c2)"></div>PLC PROG.</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c3)"></div>ROBOT</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c5)"></div>ING PROCESO</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c6)"></div>SECURITY</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--c7)"></div>OTROS</div>
+      </div>
+    </div>
+
+    <!-- Tabla servicios -->
+    <div class="card">
+      <div class="card-title">Detalle por Servicio — USD</div>
+      <div class="card-sub">Horas & costo total acumulado</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th class="num">Hrs</th>
+            <th class="num">Total USD</th>
+          </tr>
+        </thead>
+        <tbody id="serviceTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- KPIs servicios — dinámico -->
+    <div class="card">
+      <div class="card-title">KPIs por Servicio</div>
+      <div class="card-sub" id="svc-kpi-sub">Indicadores del período completo</div>
+      <div id="svc-kpi-bars" style="display:flex; flex-direction:column; gap:11px; margin-top:6px"></div>
+    </div>
+
+  </div><!-- /chart-grid-3 -->
+
+  <!-- ─ CLIENTES ───────────────────────────────────────────────────── -->
+  <p class="section-title" style="margin-top:28px">Costo por Cliente</p>
+  <div class="chart-grid-2">
+
+    <!-- Top 10 clientes horizontal bar -->
+    <div class="card">
+      <div class="card-title" id="cli-chart-title">Top 10 Clientes — Horas USD</div>
+      <div class="card-sub" id="cli-chart-sub">SW North America lidera con 23.1% de las horas</div>
+      <div class="chart-wrap" style="height:300px">
+        <canvas id="chartClientBars"></canvas>
+      </div>
+    </div>
+
+    <!-- Tabla clientes -->
+    <div class="card">
+      <div class="card-title">Detalle Clientes — Total USD</div>
+      <div class="card-sub">Todos los clientes, ordenados por costo total</div>
+      <div style="overflow-y:auto; max-height:340px">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th class="num">Hrs</th>
+              <th class="num">Total USD</th>
+            </tr>
+          </thead>
+          <tbody id="clientTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─ KPIs CLIENTES ──────────────────────────────────────────────── -->
+  <div class="chart-grid-3" style="margin-top:16px">
+    <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card-title">KPIs por Cliente</div>
+      <div id="cli-kpi-stats"></div>
+    </div>
+
+    <!-- Costo acumulado donut clientes top 5 -->
+    <div class="card">
+      <div class="card-title" id="cli-donut-title">Distribución Costo — Top 5 Clientes</div>
+      <div class="card-sub" id="cli-donut-sub">Costo total USD</div>
+      <div class="chart-wrap" style="height:230px; display:flex; align-items:center; justify-content:center;">
+        <canvas id="chartClientDonut"></canvas>
+      </div>
+    </div>
+
+    <!-- MXN detail -->
+    <div class="card">
+      <div class="card-title">Detalle MXN — Clientes Activos</div>
+      <div class="card-sub">Clientes con costos en pesos</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th class="num">Hrs MXN</th>
+            <th class="num">Costo MXN</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill pill-purple">COMAU AUTO.</span></td>
+            <td class="num">1,951.5</td>
+            <td class="num bold">$328,362</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-blue">MOVEATECH</span></td>
+            <td class="num">240.5</td>
+            <td class="num bold">$124,397</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-green">SECURITY SVC</span></td>
+            <td class="num" colspan="2" style="color:var(--text-3); font-style:italic">vía COMAU MXN</td>
+          </tr>
+          <tr class="row-highlight">
+            <td><strong>TOTAL MXN</strong></td>
+            <td class="num bold">2,192</td>
+            <td class="num bold">$452,758</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:16px; padding:12px; background:var(--bg-page); border-radius:var(--radius-sm)">
+        <div style="font-size:.7rem; color:var(--text-3); font-weight:600; text-transform:uppercase; margin-bottom:6px">Composición del costo MXN</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <span class="pill pill-purple" style="font-size:.75rem">COMAU 72.5%</span>
+          <span class="pill pill-blue" style="font-size:.75rem">MOVEATECH 27.5%</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ─── PASIVO CONGELADO ──────────────────────────────────────────────── -->
+  <p class="section-title" style="margin-top:36px">Pasivo Congelado</p>
+
+  <p style="font-size:.74rem;font-weight:600;color:var(--text-2);margin-bottom:14px">
+    &#128203; Cierre Vivo &mdash; ago-26
+    <span style="font-weight:400;color:var(--text-3)">(en curso, pendiente de congelarse)</span>
+  </p>
+
+  <div class="kpi-grid" style="margin-bottom:22px">
+    <div class="kpi-card c5">
+      <div class="kpi-label">Mes Activo</div>
+      <div class="kpi-value">ago-26</div>
+      <div class="kpi-sub">cierre en curso</div>
+      <span class="kpi-icon">&#128197;</span>
+    </div>
+    <div class="kpi-card c6">
+      <div class="kpi-label">TC de Cierre</div>
+      <div class="kpi-value" style="font-size:1.3rem">17.0427</div>
+      <div class="kpi-sub">MXN / USD</div>
+      <span class="kpi-icon">&#128178;</span>
+    </div>
+    <div class="kpi-card c2">
+      <div class="kpi-label">Personas</div>
+      <div class="kpi-value">9</div>
+      <div class="kpi-sub">t&eacute;cnicos en pasivo</div>
+      <span class="kpi-icon">&#128101;</span>
+    </div>
+    <div class="kpi-card c1">
+      <div class="kpi-label">Horas Pendientes</div>
+      <div class="kpi-value">3,038</div>
+      <div class="kpi-sub">hrs por cobrar</div>
+      <span class="kpi-icon">&#9203;</span>
+    </div>
+    <div class="kpi-card c3">
+      <div class="kpi-label">Neto USD</div>
+      <div class="kpi-value">$11,070</div>
+      <div class="kpi-sub">estimado vivo</div>
+      <span class="kpi-icon">&#128181;</span>
+    </div>
+    <div class="kpi-card c4">
+      <div class="kpi-label">Total MXN c/IVA</div>
+      <div class="kpi-value" style="font-size:1.2rem">$621,129</div>
+      <div class="kpi-sub">estimado vivo</div>
+      <span class="kpi-icon">&#128176;</span>
+    </div>
+  </div>
+
+  <div class="chart-grid-2">
+
+    <!-- Cierres Hist&oacute;ricos -->
+    <div class="card">
+      <div class="card-title">Cierres Hist&oacute;ricos (Congelados)</div>
+      <div class="card-sub">Pasivos cerrados y facturados por mes</div>
+      <div style="overflow-x:auto;margin-top:10px">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Mes</th>
+              <th class="num">TC</th>
+              <th class="num">Personas</th>
+              <th class="num">Horas</th>
+              <th class="num">Total USD</th>
+              <th class="num">Total MXN c/IVA</th>
+              <th class="num">Neto MXN</th>
+              <th class="num">Neto USD</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600">jul-26</td>
+              <td class="num">17.3562</td>
+              <td class="num">17</td>
+              <td class="num">1,858</td>
+              <td class="num">$63,464</td>
+              <td class="num">$942,164</td>
+              <td class="num">$901,245</td>
+              <td class="num">$9,180</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">ago-26</td>
+              <td class="num">17.0427</td>
+              <td class="num">9</td>
+              <td class="num">1,110</td>
+              <td class="num">$39,948</td>
+              <td class="num">$522,835</td>
+              <td class="num">$492,779</td>
+              <td class="num">$9,270</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Detalle por Cliente -->
+    <div class="card">
+      <div class="card-title">Detalle por Cliente</div>
+      <div class="card-sub">Desglose por cliente en el cierre congelado</div>
+      <div style="overflow-y:auto;max-height:340px;margin-top:10px">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th class="num">Pers.</th>
+              <th class="num">Horas</th>
+              <th class="num">Total USD</th>
+              <th class="num">Total MXN</th>
+              <th class="num">Neto MXN</th>
+              <th class="num">Neto USD</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" style="background:var(--bg-page);font-weight:700;font-size:.67rem;color:var(--c1);padding:8px 8px 4px;text-transform:uppercase;letter-spacing:.05em">Cierre jul-26</td></tr>
+            <tr><td style="font-size:.72rem">SW NORTH AMERICA, INC</td><td class="num">6</td><td class="num">523.5</td><td class="num">$17,263</td><td class="num">$299,611</td><td class="num">$296,950</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">MATUK LLC</td><td class="num">3</td><td class="num">576</td><td class="num">$21,080</td><td class="num">$206,539</td><td class="num">$204,687</td><td class="num">$9,180</td></tr>
+            <tr><td style="font-size:.72rem">GENERAL MOTORS MX</td><td class="num">2</td><td class="num">206.5</td><td class="num">$6,625</td><td class="num">$114,985</td><td class="num">$107,521</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">PARI</td><td class="num">1</td><td class="num">185</td><td class="num">$6,475</td><td class="num">$112,381</td><td class="num">$100,836</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">ATS LIFE SCIENCE</td><td class="num">1</td><td class="num">111.75</td><td class="num">$3,129</td><td class="num">$54,308</td><td class="num">$53,722</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">MEHNERT USA, LLC.</td><td class="num">1</td><td class="num">74</td><td class="num">$2,368</td><td class="num">$41,099</td><td class="num">$36,877</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">MOVEATECH</td><td class="num">1</td><td class="num">58</td><td class="num">$3,364</td><td class="num">$58,386</td><td class="num">$47,984</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">HALSTON SOFTWARE</td><td class="num">1</td><td class="num">80</td><td class="num">$2,160</td><td class="num">$37,489</td><td class="num">$37,085</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">COMAU AUTOMATIZACION</td><td class="num">1</td><td class="num">43.5</td><td class="num">$1,001</td><td class="num">$17,365</td><td class="num">$15,581</td><td class="num">&mdash;</td></tr>
+            <tr class="row-highlight">
+              <td><strong>TOTAL jul-26</strong></td>
+              <td class="num bold">17</td>
+              <td class="num bold">1,858.25</td>
+              <td class="num bold">$63,464</td>
+              <td class="num bold">$942,164</td>
+              <td class="num bold">$901,245</td>
+              <td class="num bold">$9,180</td>
+            </tr>
+            <tr><td colspan="7" style="background:var(--bg-page);font-weight:700;font-size:.67rem;color:var(--c2);padding:8px 8px 4px;text-transform:uppercase;letter-spacing:.05em">Cierre ago-26</td></tr>
+            <tr><td style="font-size:.72rem">MATUK LLC</td><td class="num">3</td><td class="num">503</td><td class="num">$18,865</td><td class="num">$163,525</td><td class="num">$162,130</td><td class="num">$9,270</td></tr>
+            <tr><td style="font-size:.72rem">GENERAL MOTORS MX</td><td class="num">3</td><td class="num">170</td><td class="num">$5,675</td><td class="num">$96,717</td><td class="num">$89,720</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">GENERAL MOTORS LLC</td><td class="num">1</td><td class="num">95</td><td class="num">$3,800</td><td class="num">$64,762</td><td class="num">$58,109</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">SW NORTH AMERICA, INC</td><td class="num">1</td><td class="num">98.5</td><td class="num">$3,645</td><td class="num">$62,112</td><td class="num">$55,731</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">ATS LIFE SCIENCE</td><td class="num">1</td><td class="num">113</td><td class="num">$3,390</td><td class="num">$57,775</td><td class="num">$57,152</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">ZT GROUP</td><td class="num">1</td><td class="num">88.67</td><td class="num">$3,103</td><td class="num">$52,891</td><td class="num">$47,458</td><td class="num">&mdash;</td></tr>
+            <tr><td style="font-size:.72rem">PARI</td><td class="num">1</td><td class="num">42</td><td class="num">$1,470</td><td class="num">$25,053</td><td class="num">$22,479</td><td class="num">&mdash;</td></tr>
+            <tr class="row-highlight">
+              <td><strong>TOTAL ago-26</strong></td>
+              <td class="num bold">9</td>
+              <td class="num bold">1,110.17</td>
+              <td class="num bold">$39,948</td>
+              <td class="num bold">$522,835</td>
+              <td class="num bold">$492,779</td>
+              <td class="num bold">$9,270</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── PASIVO VIÁTICOS SEP-26 ───────────────────────────────────────────── -->
+  <p class="section-title" style="margin-top:36px">Pasivo Vi&aacute;ticos — Sep 2026</p>
+
+  <p style="font-size:.74rem;font-weight:600;color:var(--text-2);margin-bottom:14px">
+    &#9992;&#65039; Cierre Congelado &mdash; sep-26
+    <span style="font-weight:400;color:var(--text-3)">(vi&aacute;ticos facturados por cliente)</span>
+  </p>
+
+  <div class="kpi-grid" style="margin-bottom:22px">
+    <div class="kpi-card c5">
+      <div class="kpi-label">Mes Cerrado</div>
+      <div class="kpi-value">sep-26</div>
+      <div class="kpi-sub">vi&aacute;ticos congelados</div>
+      <span class="kpi-icon">&#128197;</span>
+    </div>
+    <div class="kpi-card c6">
+      <div class="kpi-label">TC de Cierre</div>
+      <div class="kpi-value" style="font-size:1.3rem">17.0427</div>
+      <div class="kpi-sub">MXN / USD</div>
+      <span class="kpi-icon">&#128178;</span>
+    </div>
+    <div class="kpi-card c2">
+      <div class="kpi-label">Personas</div>
+      <div class="kpi-value">32</div>
+      <div class="kpi-sub">con vi&aacute;ticos</div>
+      <span class="kpi-icon">&#128101;</span>
+    </div>
+    <div class="kpi-card c1">
+      <div class="kpi-label">D&iacute;as</div>
+      <div class="kpi-value">526</div>
+      <div class="kpi-sub">d&iacute;as facturados</div>
+      <span class="kpi-icon">&#128340;</span>
+    </div>
+    <div class="kpi-card c3">
+      <div class="kpi-label">Total USD</div>
+      <div class="kpi-value">$71,645</div>
+      <div class="kpi-sub">vi&aacute;ticos cobrados</div>
+      <span class="kpi-icon">&#128181;</span>
+    </div>
+    <div class="kpi-card c5">
+      <div class="kpi-label">Total MXN c/IVA</div>
+      <div class="kpi-value" style="font-size:1.15rem">$1,221,024</div>
+      <div class="kpi-sub">monto bruto facturado</div>
+      <span class="kpi-icon">&#128176;</span>
+    </div>
+    <div class="kpi-card c4">
+      <div class="kpi-label">Neto MXN</div>
+      <div class="kpi-value" style="font-size:1.2rem">$1,190,923</div>
+      <div class="kpi-sub">neto cobrado</div>
+      <span class="kpi-icon">&#128176;</span>
+    </div>
+  </div>
+
+  <div class="card" style="max-width:700px">
+    <div class="card-title">Detalle Vi&aacute;ticos por Cliente — Sep 2026</div>
+    <div class="card-sub">Pasivo de vi&aacute;ticos congelado y facturado</div>
+    <div style="overflow-x:auto;margin-top:10px">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th class="num">Pers.</th>
+            <th class="num">D&iacute;as</th>
+            <th class="num">Total USD</th>
+            <th class="num">Total MXN</th>
+            <th class="num">Neto MXN</th>
+            <th class="num">%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="font-size:.72rem">SW NORTH AMERICA</td><td class="num">10</td><td class="num">198</td><td class="num">$38,460</td><td class="num">$655,462</td><td class="num">$633,879</td><td class="num">53.7%</td></tr>
+          <tr><td style="font-size:.72rem">MATUK LLC</td><td class="num">4</td><td class="num">79</td><td class="num">$14,765</td><td class="num">$251,635</td><td class="num">$249,250</td><td class="num">20.6%</td></tr>
+          <tr><td style="font-size:.72rem">ATS LIFE SCIENCES</td><td class="num">9</td><td class="num">138</td><td class="num">$6,900</td><td class="num">$117,595</td><td class="num">$116,961</td><td class="num">9.6%</td></tr>
+          <tr><td style="font-size:.72rem">COMAU MX</td><td class="num">2</td><td class="num">54</td><td class="num">$6,150</td><td class="num">$104,813</td><td class="num">$104,813</td><td class="num">8.6%</td></tr>
+          <tr><td style="font-size:.72rem">GENERAL MOTORS MX</td><td class="num">6</td><td class="num">42</td><td class="num">$4,620</td><td class="num">$78,737</td><td class="num">$74,552</td><td class="num">6.4%</td></tr>
+          <tr><td style="font-size:.72rem">ZT GROUP</td><td class="num">1</td><td class="num">15</td><td class="num">$750</td><td class="num">$12,782</td><td class="num">$11,469</td><td class="num">1.0%</td></tr>
+          <tr class="row-highlight">
+            <td><strong>TOTAL</strong></td>
+            <td class="num bold">32</td>
+            <td class="num bold">526</td>
+            <td class="num bold">$71,645</td>
+            <td class="num bold">$1,221,024</td>
+            <td class="num bold">$1,190,923</td>
+            <td class="num bold">100%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main><!-- /page -->
+
+<!-- ═══ SCRIPTS ═══════════════════════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────── DATA ─────────────────────────────────────────── */
+const MONTHS = ['Nov-25','Dic-25','Ene-26','Feb-26','Mar-26','Abr-26','May-26','Jun-26','Jul-26','Ago-26','Sep-26'];
+
+const monthly = [
+  { m:'Nov-25', uHrs:187,    uCostHrs:12090.52,  uPerdiem:0,        uTotal:12090.52,   mxHrs:0,     mxCost:0,         mxTotal:0         },
+  { m:'Dic-25', uHrs:198.5,  uCostHrs:11734.91,  uPerdiem:2232.76,  uTotal:13967.67,   mxHrs:0,     mxCost:0,         mxTotal:0         },
+  { m:'Ene-26', uHrs:5515.75,uCostHrs:138190.50, uPerdiem:28422.41, uTotal:166612.91,  mxHrs:0,     mxCost:0,         mxTotal:0         },
+  { m:'Feb-26', uHrs:5096.93,uCostHrs:133594.22, uPerdiem:34965.52, uTotal:168559.74,  mxHrs:0,     mxCost:0,         mxTotal:0         },
+  { m:'Mar-26', uHrs:5554.20,uCostHrs:160993.32, uPerdiem:34258.62, uTotal:195251.94,  mxHrs:0,     mxCost:0,         mxTotal:0         },
+  { m:'Abr-26', uHrs:8141.32,uCostHrs:247997.53, uPerdiem:45590.52, uTotal:293588.05,  mxHrs:406,   mxCost:68567.24,  mxTotal:68567.24  },
+  { m:'May-26', uHrs:7215.35,uCostHrs:197342.80, uPerdiem:41620.69, uTotal:238963.49,  mxHrs:577,   mxCost:96692.24,  mxTotal:96692.24  },
+  { m:'Jun-26', uHrs:6684.29,uCostHrs:179532.46, uPerdiem:44435.34, uTotal:223967.80,  mxHrs:456.5, mxCost:76279.74,  mxTotal:76279.74  },
+  { m:'Jul-26', uHrs:8940.25,uCostHrs:224056.47, uPerdiem:75099.14, uTotal:299155.60,  mxHrs:582.5, mxCost:162645.69, mxTotal:162645.69 },
+  { m:'Ago-26', uHrs:9728.62,uCostHrs:250014.53, uPerdiem:92284.48, uTotal:342299.01,  mxHrs:283.5, mxCost:68435.78,  mxTotal:68435.78  },
+  { m:'Sep-26', uHrs:2874.33,uCostHrs:73461.04,  uPerdiem:28982.76, uTotal:102443.80,  mxHrs:57,    mxCost:9975.00,   mxTotal:9975.00   },
+];
+
+const services = [
+  { name:'ELECTROMECHANICAL', hrs:18493.69, total:599488.48,  pill:'pill-blue'   },
+  { name:'PLC PROGRAMMING',   hrs:22063.85, total:640924.73,  pill:'pill-purple' },
+  { name:'ROBOT',             hrs:5071.50,  total:207248.74,  pill:'pill-green'  },
+  { name:'ING PROCESO',       hrs:4176.00,  total:230718.97,  pill:'pill-cyan'   },
+  { name:'SECURITY',          hrs:1228.00,  total:36147.41,   pill:'pill-red'    },
+  { name:'SITE LEAD',         hrs:343.00,   total:22176.72,   pill:'pill-amber'  },
+  { name:'MECHATRONIC',       hrs:481.50,   total:22260.34,   pill:'pill-pink'   },
+];
+
+const clients = [
+  { name:'SW NORTH AMERICA, INC', hrs:12456.5, total:506081.03 },
+  { name:'GENERAL MOTORS MX',     hrs:10890.4, total:303826.59 },
+  { name:'MATUK LLC',             hrs:5295.5,  total:261897.84 },
+  { name:'ATS OHIO',              hrs:5427.3,  total:174227.08 },
+  { name:'ATS LIFE SCIENCE',      hrs:3170.41, total:92864.21  },
+  { name:'PARI',                  hrs:2404.0,  total:74535.34  },
+  { name:'MAGNIT',                hrs:1969.5,  total:56417.19  },
+  { name:'COMAU AUTOMATIZACION',  hrs:1589.5,  total:61641.38  },
+  { name:'ATS GLOBAL',            hrs:1743.13, total:50860.60  },
+  { name:'GP STRATEGIES',         hrs:1451.75, total:30343.97  },
+  { name:'HALSTON SOFTWARE',      hrs:964.0,   total:22275.00  },
+  { name:'INNOVATIVE',            hrs:1157.5,  total:30537.07  },
+  { name:'ERDMAN',                hrs:349.3,   total:12921.64  },
+  { name:'WAUSEON',               hrs:178.0,   total:7383.62   },
+  { name:'GENERAL MOTORS',        hrs:42.5,    total:3881.47   },
+  { name:'INTEGRION',             hrs:46.0,    total:2344.83   },
+  { name:'MOVEATECH',             hrs:251.0,   total:10756.90  },
+  { name:'COMAU LLC',             hrs:416.0,   total:18531.90  },
+  { name:'DIGITEK',               hrs:196.25,  total:4906.25   },
+  { name:'MEHNERT USA, LLC.',     hrs:185.5,   total:5117.24   },
+  { name:'SIMASA',                hrs:53.0,    total:1644.00   },
+  { name:'ATS INDUSTRIAL',        hrs:343.0,   total:22176.72  },
+  { name:'ADMON',                 hrs:1277.5,  total:3793.53   },
+].sort((a,b)=>b.total-a.total);
+
+/* ── Per-month service data [hrs, costUSD] ───────────────────────────────── */
+const svcByMonth = {
+  'ELECTROMECHANICAL': {'Ene-26':[1329.0,33603],'Feb-26':[1040.9,26297],'Mar-26':[1054.7,31295],'Abr-26':[2540.7,74732],'May-26':[3250.7,88060],'Jun-26':[3259.9,86490],'Jul-26':[4192.8,94105],'Ago-26':[1825.0,40630]},
+  'PLC PROGRAMMING':   {'Ene-26':[2737.2,73342],'Feb-26':[2873.0,75549],'Mar-26':[2910.5,82717],'Abr-26':[3800.1,103603],'May-26':[2896.7,78285],'Jun-26':[2382.3,62793],'Jul-26':[3070.0,82922],'Ago-26':[1393.9,39709]},
+  'ROBOT':             {'Ene-26':[285.5,8659],'Feb-26':[603.0,18280],'Mar-26':[1092.0,33284],'Abr-26':[1104.0,33755],'May-26':[651.5,20527],'Jun-26':[390.0,12389],'Jul-26':[574.0,17928],'Ago-26':[371.5,10099]},
+  'ING PROCESO':       {'Dic-25':[42.5,1649],'Ene-26':[339.5,9443],'Feb-26':[484.5,13554],'Mar-26':[477.0,13263],'Abr-26':[562.5,15575],'May-26':[397.0,10206],'Jun-26':[442.0,12429],'Jul-26':[854.0,23221],'Ago-26':[577.0,15267]},
+  'SECURITY':          {'Ene-26':[824.5,13143],'Feb-26':[95.5,0],'Mar-26':[20.0,434],'Abr-26':[134.0,20797],'May-26':[19.5,265],'Jul-26':[39.0,437],'Ago-26':[95.5,1070]},
+  'SITE LEAD':         {'Nov-25':[187.0,12091],'Dic-25':[156.0,10086]},
+  'MECHATRONIC':       {'Jun-26':[210.0,5431],'Jul-26':[210.5,5444],'Ago-26':[61.0,1420]},
+};
+
+/* ── Per-month client data [hrs, costUSD] ────────────────────────────────── */
+const cliByMonth = {
+  'SW NORTH AMERICA,INC':  {'Ene-26':[969.5,26286],'Feb-26':[1667.5,45475],'Mar-26':[1364.0,41732],'Abr-26':[1792.5,48963],'May-26':[1665.0,41527],'Jun-26':[1613.5,39496],'Jul-26':[2270.5,56169],'Ago-26':[1114.0,27089]},
+  'GENERAL MOTORS MX':     {'Ene-26':[1024.5,29056],'Feb-26':[1458.2,39578],'Mar-26':[1244.5,34769],'Abr-26':[1571.1,43050],'May-26':[1360.0,38083],'Jun-26':[1437.1,40775],'Jul-26':[1936.5,54851],'Ago-26':[858.5,23666]},
+  'ATS OHIO':              {'Mar-26':[393.0,13044],'Abr-26':[1961.1,62773],'May-26':[1615.3,51720],'Jun-26':[1457.9,46690]},
+  'MATUK LLC':             {'Ene-26':[456.5,12973],'Feb-26':[644.5,18381],'Mar-26':[637.0,18091],'Abr-26':[754.5,21369],'May-26':[554.0,14943],'Jun-26':[628.0,18041],'Jul-26':[1044.0,28953],'Ago-26':[577.0,15267]},
+  'ATS LIFE SCIENCE':      {'Abr-26':[90.0,2328],'May-26':[525.7,12897],'Jun-26':[312.0,7548],'Jul-26':[1708.8,41684],'Ago-26':[534.0,12890]},
+  'PARI':                  {'Ene-26':[72.0,2048],'Feb-26':[160.0,4552],'Mar-26':[521.0,16180],'Abr-26':[648.0,20272],'May-26':[621.5,19166],'Jun-26':[154.5,4662],'Jul-26':[185.0,5582],'Ago-26':[42.0,1267]},
+  'MAGNIT':                {'Ene-26':[685.2,13644],'Feb-26':[509.2,14738],'Mar-26':[571.0,19620],'Abr-26':[204.0,7717]},
+  'ATS GLOBAL':            {'Ene-26':[902.5,23031],'Feb-26':[207.4,6072],'Mar-26':[504.2,13092],'Abr-26':[129.0,3226]},
+  'COMAU AUTOMATIZACION':  {'Ene-26':[693.0,13143],'Mar-26':[20.0,434],'Abr-26':[278.0,23984],'May-26':[115.0,2309],'Jun-26':[210.0,5431],'Jul-26':[273.5,6098]},
+  'GP STRATEGIES':         {'Ene-26':[348.5,8013],'Feb-26':[271.0,4884],'Mar-26':[76.5,1800],'Abr-26':[189.0,4538],'May-26':[178.5,4058],'Jun-26':[29.2,706],'Jul-26':[124.5,2346],'Ago-26':[234.5,4000]},
+  'ADMON':                 {'Ene-26':[45.0,327],'Feb-26':[179.0,0],'Mar-26':[153.0,0],'Abr-26':[228.5,1315],'May-26':[103.0,169],'Jun-26':[239.0,1259],'Jul-26':[244.5,724],'Ago-26':[85.5,0]},
+  'INNOVATIVE':            {'May-26':[179.0,4938],'Jun-26':[124.5,3434],'Jul-26':[466.0,9141],'Ago-26':[388.0,8800]},
+  'HALSTON SOFTWARE':      {'Abr-26':[49.0,1141],'May-26':[178.0,3980],'Jun-26':[304.0,7076],'Jul-26':[344.0,8007],'Ago-26':[89.0,2072]},
+  'COMAU LLC':             {'Ene-26':[88.0,2655],'Jul-26':[151.0,3905],'Ago-26':[177.0,4420]},
+  'ERDMAN':                {'Mar-26':[70.0,2233],'Abr-26':[200.6,6400],'May-26':[78.7,2509]},
+  'ATS INDUSTRIAL':        {'Nov-25':[187.0,12091],'Dic-25':[156.0,10086]},
+  'MOVEATECH':             {'Jun-26':[20.0,552],'Jul-26':[118.0,4555],'Ago-26':[113.0,5650]},
+  'DIGITEK':               {'May-26':[41.8,1044],'Jun-26':[154.5,3862]},
+  'MEHNERT USA, LLC.':     {'Jul-26':[74.0,2041],'Ago-26':[111.5,3076]},
+  'WAUSEON':               {'Ene-26':[178.0,5371]},
+  'SIMASA':                {'Ene-26':[53.0,1644]},
+  'INTEGRION':             {'Abr-26':[46.0,1388]},
+  'GENERAL MOTORS':        {'Dic-25':[42.5,1649]},
+};
+
+/* Pill class per service */
+const SVC_PILLS = {
+  'ELECTROMECHANICAL':'pill-blue','PLC PROGRAMMING':'pill-purple','ROBOT':'pill-green',
+  'ING PROCESO':'pill-cyan','SECURITY':'pill-red','SITE LEAD':'pill-amber','MECHATRONIC':'pill-pink'
+};
+
+/* ─────────────────────────── STATE ────────────────────────────────────────── */
+let activeMonth = 'TODOS';
+let chartMonthlyHours, chartMonthlyCost, chartServiceDonut, chartClientBars, chartClientDonut;
+
+/* ─────────────────────────── COLORS ───────────────────────────────────────── */
+const CATS = ['#1A3660','#1F5BA6','#3D7AB5','#E8A020','#059669','#DC2626','#64748B'];
+function hexAlpha(h, a) {
+  const r=parseInt(h.slice(1,3),16), g=parseInt(h.slice(3,5),16), b=parseInt(h.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function isDark()    { return document.documentElement.getAttribute('data-theme')==='dark'; }
+function textColor() { return isDark() ? '#E8F0FB' : '#0D1F3C'; }
+function subColor()  { return isDark() ? '#7BA3CF' : '#3D5580'; }
+function gridColor() { return isDark() ? 'rgba(255,255,255,.06)' : 'rgba(26,54,96,.06)'; }
+function bgCard()    { return isDark() ? '#0D1F3C' : '#FFFFFF'; }
+function borderCol() { return isDark() ? '#1F3860' : '#D6E0EF'; }
+
+/* ─────────────────────────── FORMAT HELPERS ───────────────────────────────── */
+function fmtMoney(n) {
+  if (n === 0) return '—';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + (n/1e3).toFixed(1) + 'K';
+  return '$' + n.toFixed(0);
+}
+function fmtHrs(n) {
+  if (n === 0) return '—';
+  if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+  return n.toFixed(1);
+}
+function fmtFull(n) { return n===0 ? '—' : '$'+n.toLocaleString('es-MX',{maximumFractionDigits:0}); }
+function fmtFullH(n){ return n===0 ? '—' : n.toLocaleString('es-MX',{maximumFractionDigits:1}); }
+
+/* ─────────────────────────── KPI UPDATE ───────────────────────────────────── */
+function updateKPIs(data) {
+  const totUHrs     = data.reduce((a,m)=>a+m.uHrs, 0);
+  const totMxHrs    = data.reduce((a,m)=>a+m.mxHrs, 0);
+  const totHrs      = totUHrs + totMxHrs;
+  const totUTotal   = data.reduce((a,m)=>a+m.uTotal, 0);
+  const totMxTotal  = data.reduce((a,m)=>a+m.mxTotal, 0);
+  const isSingle    = data.length === 1;
+
+  document.getElementById('kpi-total-horas').textContent  = fmtHrs(totHrs);
+  document.getElementById('kpi-sub-horas').textContent    = isSingle ? data[0].m : 'hrs acumuladas';
+  document.getElementById('kpi-costo-usd').textContent    = fmtMoney(totUTotal);
+  document.getElementById('kpi-sub-costo-usd').textContent= isSingle ? data[0].m : 'Hrs + Perdiem';
+  document.getElementById('kpi-costo-mxn').textContent    = fmtMoney(totMxTotal > 0 ? totMxTotal : 0);
+  document.getElementById('kpi-sub-costo-mxn').textContent= isSingle ? (totMxTotal===0?'Sin movimiento MXN':data[0].m) : 'Hrs MXN';
+
+  if (isSingle) {
+    document.getElementById('kpi-mes-pico').textContent       = data[0].m;
+    document.getElementById('kpi-sub-mes-pico').textContent   = fmtHrs(totHrs) + ' hrs totales';
+    document.getElementById('kpi-meses-activos').textContent  = '1';
+    document.getElementById('kpi-sub-meses-activos').textContent = 'mes seleccionado';
+    document.getElementById('kpi-prom-hrs').textContent       = fmtHrs(totHrs);
+    document.getElementById('kpi-sub-prom-hrs').textContent   = 'hrs en el mes';
+  } else {
+    const peak = monthly.reduce((a,b)=>(a.uHrs+a.mxHrs)>(b.uHrs+b.mxHrs)?a:b);
+    document.getElementById('kpi-mes-pico').textContent       = peak.m;
+    document.getElementById('kpi-sub-mes-pico').textContent   = fmtHrs(peak.uHrs+peak.mxHrs) + ' horas';
+    document.getElementById('kpi-meses-activos').textContent  = data.filter(m=>m.uHrs+m.mxHrs>0).length;
+    const avg = totHrs / data.length;
+    document.getElementById('kpi-sub-meses-activos').textContent = 'prom ' + fmtHrs(avg) + ' hrs/mes';
+    document.getElementById('kpi-prom-hrs').textContent       = fmtHrs(avg);
+    document.getElementById('kpi-sub-prom-hrs').textContent   = 'hrs promedio / mes';
+  }
+}
+
+/* ─────────────────────────── TABLE BUILDERS ───────────────────────────────── */
+function buildServiceTable(rows) {
+  /* rows = [{name, hrs, total, pill}] — pass null for the global totals */
+  const stb = document.getElementById('serviceTableBody');
+  stb.innerHTML = '';
+  const data = rows || services;
+  let totHrs = 0, totUSD = 0;
+  data.forEach(s => {
+    totHrs += s.hrs; totUSD += s.total;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="pill ${s.pill}" style="white-space:nowrap;font-size:.65rem">${s.name}</span></td>
+      <td class="num">${s.hrs.toLocaleString('es-MX',{maximumFractionDigits:0})}</td>
+      <td class="num">$${s.total.toLocaleString('es-MX',{maximumFractionDigits:0})}</td>`;
+    stb.appendChild(tr);
+  });
+  const tot = document.createElement('tr');
+  tot.className = 'row-highlight';
+  tot.innerHTML = `<td><strong>TOTAL</strong></td><td class="num bold">${totHrs.toLocaleString('es-MX',{maximumFractionDigits:0})}</td><td class="num bold">$${totUSD.toLocaleString('es-MX',{maximumFractionDigits:0})}</td>`;
+  stb.appendChild(tot);
+}
+
+function buildClientTable(rows) {
+  const ctb = document.getElementById('clientTableBody');
+  ctb.innerHTML = '';
+  const data = rows || clients;
+  let totHrs = 0, totUSD = 0;
+  data.forEach((c,i) => {
+    totHrs += c.hrs; totUSD += c.total;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text-3);font-size:.72rem">${i+1}</td>
+      <td style="font-size:.72rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</td>
+      <td class="num">${c.hrs.toLocaleString('es-MX',{maximumFractionDigits:0})}</td>
+      <td class="num">$${c.total.toLocaleString('es-MX',{maximumFractionDigits:0})}</td>`;
+    ctb.appendChild(tr);
+  });
+  const tot = document.createElement('tr');
+  tot.className = 'row-highlight';
+  tot.innerHTML = `<td></td><td><strong>TOTAL</strong></td><td class="num bold">${totHrs.toLocaleString('es-MX',{maximumFractionDigits:0})}</td><td class="num bold">$${totUSD.toLocaleString('es-MX',{maximumFractionDigits:0})}</td>`;
+  ctb.appendChild(tot);
+}
+
+function buildMonthlyTable(data) {
+  const mtb = document.getElementById('monthlyTableBody');
+  mtb.innerHTML = '';
+  data.forEach(m => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:600">${m.m}</td>
+      <td class="num">${fmtFullH(m.uHrs)}</td>
+      <td class="num">${fmtFull(m.uCostHrs)}</td>
+      <td class="num">${m.uPerdiem===0?'—':'$'+m.uPerdiem.toLocaleString('es-MX',{maximumFractionDigits:0})}</td>
+      <td class="num" style="font-weight:600">${fmtFull(m.uTotal)}</td>
+      <td class="num">${fmtFullH(m.mxHrs)}</td>
+      <td class="num">${fmtFull(m.mxCost)}</td>
+      <td class="num" style="font-weight:600">${fmtFull(m.mxTotal)}</td>`;
+    mtb.appendChild(tr);
+  });
+  if (data.length > 1) {
+    const tot = document.createElement('tr');
+    tot.className = 'row-highlight';
+    const s = (k) => data.reduce((a,m)=>a+m[k],0);
+    tot.innerHTML = `
+      <td><strong>TOTAL</strong></td>
+      <td class="num bold">${fmtFullH(s('uHrs'))}</td>
+      <td class="num bold">${fmtFull(s('uCostHrs'))}</td>
+      <td class="num bold">${fmtFull(s('uPerdiem'))}</td>
+      <td class="num bold">${fmtFull(s('uTotal'))}</td>
+      <td class="num bold">${fmtFullH(s('mxHrs'))}</td>
+      <td class="num bold">${fmtFull(s('mxCost'))}</td>
+      <td class="num bold">${fmtFull(s('mxTotal'))}</td>`;
+    mtb.appendChild(tot);
+  }
+}
+
+/* ─────────────────────────── CHART INIT ───────────────────────────────────── */
+function tooltipBase() {
+  return {
+    backgroundColor: bgCard(),
+    titleColor: textColor(),
+    bodyColor: subColor(),
+    borderColor: borderCol(),
+    borderWidth: 1,
+    padding: 10,
+    cornerRadius: 8,
+  };
+}
+
+function initCharts() {
+  /* 1. Monthly Hours — stacked bar */
+  chartMonthlyHours = new Chart(
+    document.getElementById('chartMonthlyHours').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        { label:'Horas USD',  data: monthly.map(m=>m.uHrs),
+          backgroundColor: MONTHS.map(()=>hexAlpha(CATS[0],.82)),
+          borderColor: MONTHS.map(()=>CATS[0]), borderWidth:1.5,
+          borderRadius:{topLeft:4,topRight:4}, borderSkipped:false },
+        { label:'Horas MXN',  data: monthly.map(m=>m.mxHrs),
+          backgroundColor: MONTHS.map(()=>hexAlpha(CATS[3],.82)),
+          borderColor: MONTHS.map(()=>CATS[3]), borderWidth:1.5,
+          borderRadius:0, borderSkipped:false }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: {
+        legend:{display:false},
+        tooltip:{ ...tooltipBase(),
+          callbacks:{ label: ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-MX',{maximumFractionDigits:1})} hrs` }
+        }
+      },
+      scales: {
+        x:{ stacked:true, grid:{color:gridColor()}, ticks:{color:subColor(),font:{size:10}} },
+        y:{ stacked:true, grid:{color:gridColor()}, ticks:{color:subColor(), callback:v=>v>=1000?(v/1000).toFixed(1)+'K':v} }
+      }
+    }
+  });
+
+  /* 2. Monthly Cost — stacked bar */
+  chartMonthlyCost = new Chart(
+    document.getElementById('chartMonthlyCost').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        { label:'Costo Hrs', data: monthly.map(m=>m.uCostHrs),
+          backgroundColor: MONTHS.map(()=>hexAlpha(CATS[1],.82)),
+          borderColor: MONTHS.map(()=>CATS[1]), borderWidth:1.5,
+          borderRadius:{topLeft:4,topRight:4}, borderSkipped:false },
+        { label:'Perdiem',   data: monthly.map(m=>m.uPerdiem),
+          backgroundColor: MONTHS.map(()=>hexAlpha(CATS[3],.82)),
+          borderColor: MONTHS.map(()=>CATS[3]), borderWidth:1.5,
+          borderRadius:0, borderSkipped:false }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: {
+        legend:{display:false},
+        tooltip:{ ...tooltipBase(),
+          callbacks:{ label: ctx=>`${ctx.dataset.label}: $${ctx.parsed.y.toLocaleString('es-MX',{maximumFractionDigits:0})}` }
+        }
+      },
+      scales: {
+        x:{ stacked:true, grid:{color:gridColor()}, ticks:{color:subColor(),font:{size:10}} },
+        y:{ stacked:true, grid:{color:gridColor()}, ticks:{color:subColor(), callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)} }
+      }
+    }
+  });
+
+  /* 3. Service donut */
+  chartServiceDonut = new Chart(
+    document.getElementById('chartServiceDonut').getContext('2d'), {
+    type:'doughnut',
+    data:{
+      labels: services.map(s=>s.name),
+      datasets:[{ data: services.map(s=>s.hrs),
+        backgroundColor: CATS.slice(0, services.length),
+        borderColor:bgCard(), borderWidth:2, hoverOffset:6 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{ legend:{display:false},
+        tooltip:{ ...tooltipBase(),
+          callbacks:{ label:ctx=>{
+            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+            const pct=(ctx.parsed/total*100).toFixed(1);
+            return `${ctx.parsed.toLocaleString('es-MX',{maximumFractionDigits:0})} hrs (${pct}%)`; } }
+        }
+      }
+    }
+  });
+
+  /* 4. Top clients horizontal bar */
+  const top10 = clients.slice(0,10);
+  chartClientBars = new Chart(
+    document.getElementById('chartClientBars').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels: top10.map(c=>c.name.length>20?c.name.slice(0,18)+'…':c.name),
+      datasets:[{ label:'Horas USD', data:top10.map(c=>c.hrs),
+        backgroundColor:top10.map((_,i)=>hexAlpha(CATS[i%CATS.length],.82)),
+        borderColor:top10.map((_,i)=>CATS[i%CATS.length]),
+        borderWidth:1.5, borderRadius:4, borderSkipped:false }]
+    },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ ...tooltipBase(),
+          callbacks:{ title:ctx=>top10[ctx[0].dataIndex].name,
+            label:ctx=>`${ctx.parsed.x.toLocaleString('es-MX',{maximumFractionDigits:1})} hrs` }
+        }
+      },
+      scales:{
+        x:{ grid:{color:gridColor()}, ticks:{color:subColor(),callback:v=>v>=1000?(v/1000).toFixed(1)+'K':v} },
+        y:{ grid:{display:false}, ticks:{color:subColor(),font:{size:10}} }
+      }
+    }
+  });
+
+  /* 5. Client cost donut */
+  const top5c = clients.slice(0,5);
+  const restCost = clients.slice(5).reduce((a,c)=>a+c.total,0);
+  chartClientDonut = new Chart(
+    document.getElementById('chartClientDonut').getContext('2d'), {
+    type:'doughnut',
+    data:{
+      labels:[...top5c.map(c=>c.name.split(' ').slice(0,2).join(' ')),'Otros'],
+      datasets:[{ data:[...top5c.map(c=>c.total), restCost],
+        backgroundColor:[...CATS.slice(0,5),'#8DA3C0'],
+        borderColor:bgCard(), borderWidth:2, hoverOffset:6 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'60%',
+      plugins:{
+        legend:{ display:true, position:'bottom',
+          labels:{color:subColor(),font:{size:10},boxWidth:10,padding:10} },
+        tooltip:{ ...tooltipBase(),
+          callbacks:{ label:ctx=>`$${ctx.parsed.toLocaleString('es-MX',{maximumFractionDigits:0})}` }
+        }
+      }
+    }
+  });
+}
+
+/* ─────────────────────────── MONTHLY CHART UPDATE ─────────────────────────── */
+function updateMonthlyCharts(month) {
+  const isAll = month === 'TODOS';
+
+  const colHrsUSD  = MONTHS.map(m => isAll ? hexAlpha(CATS[0],.82) : m===month ? hexAlpha(CATS[0],.92) : hexAlpha(CATS[0],.15));
+  const brdHrsUSD  = MONTHS.map(m => isAll ? CATS[0] : m===month ? CATS[0] : hexAlpha(CATS[0],.25));
+  const colHrsMXN  = MONTHS.map(m => isAll ? hexAlpha(CATS[3],.82) : m===month ? hexAlpha(CATS[3],.92) : hexAlpha(CATS[3],.15));
+  const brdHrsMXN  = MONTHS.map(m => isAll ? CATS[3] : m===month ? CATS[3] : hexAlpha(CATS[3],.25));
+  const colCostHrs = MONTHS.map(m => isAll ? hexAlpha(CATS[1],.82) : m===month ? hexAlpha(CATS[1],.92) : hexAlpha(CATS[1],.15));
+  const brdCostHrs = MONTHS.map(m => isAll ? CATS[1] : m===month ? CATS[1] : hexAlpha(CATS[1],.25));
+  const colPerdiem = MONTHS.map(m => isAll ? hexAlpha(CATS[3],.82) : m===month ? hexAlpha(CATS[3],.92) : hexAlpha(CATS[3],.15));
+  const brdPerdiem = MONTHS.map(m => isAll ? CATS[3] : m===month ? CATS[3] : hexAlpha(CATS[3],.25));
+
+  chartMonthlyHours.data.datasets[0].backgroundColor = colHrsUSD;
+  chartMonthlyHours.data.datasets[0].borderColor      = brdHrsUSD;
+  chartMonthlyHours.data.datasets[1].backgroundColor  = colHrsMXN;
+  chartMonthlyHours.data.datasets[1].borderColor      = brdHrsMXN;
+  chartMonthlyHours.update('none');
+
+  chartMonthlyCost.data.datasets[0].backgroundColor  = colCostHrs;
+  chartMonthlyCost.data.datasets[0].borderColor       = brdCostHrs;
+  chartMonthlyCost.data.datasets[1].backgroundColor   = colPerdiem;
+  chartMonthlyCost.data.datasets[1].borderColor       = brdPerdiem;
+  chartMonthlyCost.update('none');
+}
+
+/* ─────────────────────────── SERVICE SECTION UPDATE ───────────────────────── */
+function updateServiceSection(month) {
+  const isAll = month === 'TODOS';
+
+  // Build sorted service rows for this month
+  let svcRows;
+  if (isAll) {
+    svcRows = services.map(s => ({ name:s.name, hrs:s.hrs, total:s.total, pill:s.pill }));
+    svcRows.sort((a,b)=>b.hrs-a.hrs);
+  } else {
+    svcRows = Object.entries(svcByMonth).map(([name, months]) => {
+      const d = months[month] || [0,0];
+      return { name, hrs:d[0], total:d[1], pill: SVC_PILLS[name] || 'pill-blue' };
+    }).filter(s => s.hrs > 0).sort((a,b) => b.hrs-a.hrs);
+  }
+
+  const totalHrs = svcRows.reduce((a,s)=>a+s.hrs, 0);
+  const totalUSD = svcRows.reduce((a,s)=>a+s.total, 0);
+
+  // Update service donut chart
+  chartServiceDonut.data.labels   = svcRows.map(s=>s.name);
+  chartServiceDonut.data.datasets[0].data            = svcRows.map(s=>s.hrs);
+  chartServiceDonut.data.datasets[0].backgroundColor = svcRows.map((_,i)=>CATS[i%CATS.length]);
+  chartServiceDonut.data.datasets[0].borderColor     = bgCard();
+  chartServiceDonut.update('none');
+
+  // Update service table
+  buildServiceTable(svcRows);
+
+  // Update donut subtitle
+  const top = svcRows[0];
+  const topPct = totalHrs > 0 ? (top.hrs/totalHrs*100).toFixed(1) : '—';
+  document.getElementById('svc-donut-sub').textContent =
+    isAll
+      ? `PLC Programming lidera con 41.3% de las horas`
+      : top ? `${top.name} lidera con ${topPct}% en ${month}` : 'Sin datos';
+
+  // Update KPI subtitle
+  document.getElementById('svc-kpi-sub').textContent =
+    isAll ? 'Indicadores del período completo' : `Servicios activos en ${month}`;
+
+  // Build sparkbars in svc-kpi-bars
+  const barsDiv = document.getElementById('svc-kpi-bars');
+  barsDiv.innerHTML = '';
+  svcRows.forEach((s, i) => {
+    const pct = totalHrs > 0 ? (s.hrs/totalHrs*100) : 0;
+    const color = CATS[i % CATS.length];
+    barsDiv.innerHTML += `
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="pill ${s.pill}" style="font-size:.62rem;padding:2px 7px">${s.name}</span>
+          <span style="font-size:.72rem;font-weight:700;color:var(--text-1)">${pct.toFixed(1)}%</span>
+        </div>
+        <div style="position:relative;height:6px;background:var(--bg-page);border-radius:3px;overflow:hidden">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${Math.max(pct,1)}%;background:${color};border-radius:3px;transition:width .4s"></div>
+        </div>
+        <div style="font-size:.67rem;color:var(--text-3)">${s.hrs.toLocaleString('es-MX',{maximumFractionDigits:0})} hrs &nbsp;·&nbsp; $${s.total.toLocaleString('es-MX',{maximumFractionDigits:0})}</div>
+      </div>`;
+  });
+}
+
+/* ─────────────────────────── CLIENT SECTION UPDATE ────────────────────────── */
+function updateClientSection(month) {
+  const isAll = month === 'TODOS';
+
+  let cliRows;
+  if (isAll) {
+    cliRows = clients.map(c => ({ name:c.name, hrs:c.hrs, total:c.total }));
+  } else {
+    cliRows = Object.entries(cliByMonth).map(([name, months]) => {
+      const d = months[month] || [0,0];
+      return { name, hrs:d[0], total:d[1] };
+    }).filter(c => c.hrs > 0).sort((a,b) => b.hrs-a.hrs);
+  }
+
+  const totalHrs = cliRows.reduce((a,c)=>a+c.hrs, 0);
+  const numActive = cliRows.length;
+  const top1 = cliRows[0];
+  const top1Pct = totalHrs > 0 && top1 ? (top1.hrs/totalHrs*100).toFixed(1) : '—';
+
+  /* --- Bar chart (top 10 by hours) --- */
+  const top10 = cliRows.slice(0,10);
+  chartClientBars.data.labels = top10.map(c=>c.name.length>20?c.name.slice(0,18)+'…':c.name);
+  chartClientBars.data.datasets[0].data            = top10.map(c=>c.hrs);
+  chartClientBars.data.datasets[0].backgroundColor = top10.map((_,i)=>hexAlpha(CATS[i%CATS.length],.82));
+  chartClientBars.data.datasets[0].borderColor     = top10.map((_,i)=>CATS[i%CATS.length]);
+  // Fix tooltip full-name reference to the current top10
+  chartClientBars.options.plugins.tooltip.callbacks.title = ctx => top10[ctx[0].dataIndex].name;
+  chartClientBars.update('none');
+
+  /* --- Client donut (top 5 by cost) --- */
+  const sortedByCost = [...cliRows].sort((a,b)=>b.total-a.total);
+  const top5c  = sortedByCost.slice(0,5);
+  const restC  = sortedByCost.slice(5).reduce((a,c)=>a+c.total, 0);
+  chartClientDonut.data.labels = [...top5c.map(c=>c.name.split(' ').slice(0,2).join(' ')), 'Otros'];
+  chartClientDonut.data.datasets[0].data = [...top5c.map(c=>c.total), restC];
+  chartClientDonut.data.datasets[0].backgroundColor = [...CATS.slice(0,5),'#8DA3C0'];
+  chartClientDonut.data.datasets[0].borderColor = bgCard();
+  chartClientDonut.update('none');
+
+  /* --- Client table --- */
+  buildClientTable(cliRows);
+
+  /* --- Chart titles & subtitles --- */
+  const titleEl = document.getElementById('cli-chart-title');
+  const subEl   = document.getElementById('cli-chart-sub');
+  const donutTEl = document.getElementById('cli-donut-title');
+  const donutSEl = document.getElementById('cli-donut-sub');
+
+  if (isAll) {
+    titleEl.textContent  = 'Top 10 Clientes — Horas USD';
+    subEl.textContent    = 'SW North America lidera con 23.1% de las horas';
+    donutTEl.textContent = 'Distribución Costo — Top 5 Clientes';
+    donutSEl.textContent = 'Costo total USD';
+  } else {
+    titleEl.textContent  = `Top Clientes en ${month} — Horas USD`;
+    subEl.textContent    = top1
+      ? `${top1.name.split(' ').slice(0,3).join(' ')} lidera con ${top1Pct}% (${fmtHrs(top1.hrs)} hrs)`
+      : 'Sin actividad en este mes';
+    donutTEl.textContent = `Distribución Costo — ${month}`;
+    donutSEl.textContent = numActive + ' clientes activos';
+  }
+
+  /* --- Client KPI stats --- */
+  const statsDiv = document.getElementById('cli-kpi-stats');
+  const totalUSD = cliRows.reduce((a,c)=>a+c.total, 0);
+  const top3hrs  = cliRows.slice(0,3).reduce((a,c)=>a+c.hrs, 0);
+  const concentracion = totalHrs > 0 ? (top3hrs/totalHrs*100).toFixed(1) : '—';
+
+  statsDiv.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:var(--bg-page);border-radius:var(--radius-sm);padding:12px;text-align:center">
+        <div style="font-size:1.4rem;font-weight:800;color:var(--c2)">${numActive}</div>
+        <div style="font-size:.68rem;color:var(--text-3);margin-top:2px">Clientes activos</div>
+      </div>
+      <div style="background:var(--bg-page);border-radius:var(--radius-sm);padding:12px;text-align:center">
+        <div style="font-size:1.4rem;font-weight:800;color:var(--c3)">${top1Pct}%</div>
+        <div style="font-size:.68rem;color:var(--text-3);margin-top:2px">Top cliente</div>
+      </div>
+      <div style="background:var(--bg-page);border-radius:var(--radius-sm);padding:12px;text-align:center">
+        <div style="font-size:1.4rem;font-weight:800;color:var(--c5)">${concentracion}%</div>
+        <div style="font-size:.68rem;color:var(--text-3);margin-top:2px">Concentración top 3</div>
+      </div>
+      <div style="background:var(--bg-page);border-radius:var(--radius-sm);padding:12px;text-align:center">
+        <div style="font-size:1.1rem;font-weight:800;color:var(--c1)">${fmtMoney(totalUSD)}</div>
+        <div style="font-size:.68rem;color:var(--text-3);margin-top:2px">Total USD${isAll?'':' '+month}</div>
+      </div>
+    </div>
+    ${top1 ? `<div style="margin-top:10px;padding:10px 12px;background:var(--bg-page);border-radius:var(--radius-sm);border-left:3px solid var(--c2)">
+      <div style="font-size:.65rem;color:var(--text-3);font-weight:600;text-transform:uppercase;margin-bottom:4px">🏆 Top Cliente${isAll?'':' '+month}</div>
+      <div style="font-size:.78rem;font-weight:700;color:var(--text-1)">${top1.name}</div>
+      <div style="font-size:.7rem;color:var(--text-2);margin-top:2px">${fmtHrs(top1.hrs)} hrs &nbsp;·&nbsp; ${fmtMoney(top1.total)}</div>
+    </div>` : ''}`;
+}
+
+/* ─────────────────────────── FILTER ───────────────────────────────────────── */
+function filterDashboard(month) {
+  activeMonth = month;
+
+  // 1. Button states
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.month === month);
+  });
+
+  // 2. Filtered data for table & KPIs
+  const data = month === 'TODOS' ? monthly : monthly.filter(m => m.m === month);
+
+  // 3. KPI cards
+  updateKPIs(data);
+
+  // 4. Monthly table
+  buildMonthlyTable(data);
+
+  // 5. Monthly charts (highlight/dim)
+  updateMonthlyCharts(month);
+
+  // 6. Service section
+  updateServiceSection(month);
+
+  // 7. Client section
+  updateClientSection(month);
+}
+
+/* ─────────────────────────── THEME TOGGLE ──────────────────────────────────── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDk = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDk ? 'light' : 'dark');
+  document.querySelector('.theme-btn').textContent = isDk ? '🌙 Oscuro' : '☀️ Claro';
+
+  const allCharts = [chartMonthlyHours, chartMonthlyCost, chartServiceDonut, chartClientBars, chartClientDonut];
+  allCharts.forEach(ch => {
+    if (!ch) return;
+    if (ch.options.plugins.tooltip) {
+      Object.assign(ch.options.plugins.tooltip, { backgroundColor:bgCard(), titleColor:textColor(), bodyColor:subColor(), borderColor:borderCol() });
+    }
+    if (ch.options.scales) {
+      Object.values(ch.options.scales).forEach(sc => {
+        if (sc.grid) sc.grid.color = gridColor();
+        if (sc.ticks) sc.ticks.color = subColor();
+        if (ch.options.plugins.legend?.labels) ch.options.plugins.legend.labels.color = subColor();
+      });
+    }
+    ch.update('none');
+  });
+  [chartServiceDonut, chartClientDonut].forEach(ch => {
+    if (!ch) return;
+    ch.data.datasets[0].borderColor = bgCard();
+    ch.update('none');
+  });
+  if (chartClientDonut?.options?.plugins?.legend?.labels) {
+    chartClientDonut.options.plugins.legend.labels.color = subColor();
+    chartClientDonut.update('none');
+  }
+}
+
+/* ─────────────────────────── INIT ──────────────────────────────────────────── */
+initCharts();
+filterDashboard('TODOS');
+
+</script>
+</body>
+</html>
