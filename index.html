@@ -659,49 +659,15 @@
   <!-- ─── PASIVO CONGELADO ──────────────────────────────────────────────── -->
   <p class="section-title" style="margin-top:36px">Pasivo Congelado</p>
 
-  <p style="font-size:.74rem;font-weight:600;color:var(--text-2);margin-bottom:14px">
-    &#128203; Cierre Vivo &mdash; ago-26
-    <span style="font-weight:400;color:var(--text-3)">(en curso, pendiente de congelarse)</span>
-  </p>
-
-  <div class="kpi-grid" style="margin-bottom:22px">
-    <div class="kpi-card c5">
-      <div class="kpi-label">Mes Activo</div>
-      <div class="kpi-value">ago-26</div>
-      <div class="kpi-sub">cierre en curso</div>
-      <span class="kpi-icon">&#128197;</span>
-    </div>
-    <div class="kpi-card c6">
-      <div class="kpi-label">TC de Cierre</div>
-      <div class="kpi-value" style="font-size:1.3rem">17.0427</div>
-      <div class="kpi-sub">MXN / USD</div>
-      <span class="kpi-icon">&#128178;</span>
-    </div>
-    <div class="kpi-card c2">
-      <div class="kpi-label">Personas</div>
-      <div class="kpi-value">9</div>
-      <div class="kpi-sub">t&eacute;cnicos en pasivo</div>
-      <span class="kpi-icon">&#128101;</span>
-    </div>
-    <div class="kpi-card c1">
-      <div class="kpi-label">Horas Pendientes</div>
-      <div class="kpi-value">3,038</div>
-      <div class="kpi-sub">hrs por cobrar</div>
-      <span class="kpi-icon">&#9203;</span>
-    </div>
-    <div class="kpi-card c3">
-      <div class="kpi-label">Neto USD</div>
-      <div class="kpi-value">$11,070</div>
-      <div class="kpi-sub">estimado vivo</div>
-      <span class="kpi-icon">&#128181;</span>
-    </div>
-    <div class="kpi-card c4">
-      <div class="kpi-label">Total MXN c/IVA</div>
-      <div class="kpi-value" style="font-size:1.2rem">$621,129</div>
-      <div class="kpi-sub">estimado vivo</div>
-      <span class="kpi-icon">&#128176;</span>
-    </div>
-  </div>
+  <!-- CIERRE_VIVO_START -->
+<p class="section-sub">Cierre en curso — <strong>ago-26</strong> &nbsp;·&nbsp; TC: <strong>$17.0427</strong></p>
+            <div class="kpi-grid">
+              <div class="kpi-card"><span class="kpi-val">4.6K</span><span class="kpi-label">Horas</span><span class="kpi-sub">9 personas</span></div>
+              <div class="kpi-card"><span class="kpi-val">$148.6K</span><span class="kpi-label">Total USD</span><span class="kpi-sub">Hrs + Perdiem</span></div>
+              <div class="kpi-card"><span class="kpi-val">$825.8K</span><span class="kpi-label">Neto MXN</span><span class="kpi-sub">después retención</span></div>
+              <div class="kpi-card"><span class="kpi-val">$12.9K</span><span class="kpi-label">Neto USD</span><span class="kpi-sub">después retención</span></div>
+            </div>
+            <!-- CIERRE_VIVO_END -->
 
   <div class="chart-grid-2">
 
@@ -724,26 +690,30 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style="font-weight:600">jul-26</td>
-              <td class="num">17.3562</td>
-              <td class="num">17</td>
-              <td class="num">1,858</td>
+            <!-- HIST_ROWS_START -->
+<tr>
+              <td>ago-26</td><td class="num">$17.0427</td>
+              <td class="num">9</td><td class="num">4,566.7</td>
+              <td class="num">$148,578</td>
+              <td class="num">$825,800</td>
+              <td class="num">$12,870</td>
+            </tr>
+<tr>
+              <td>jul-26</td><td class="num">$17.3562</td>
+              <td class="num">17</td><td class="num">1,858.2</td>
               <td class="num">$63,464</td>
-              <td class="num">$942,164</td>
-              <td class="num">$901,245</td>
-              <td class="num">$9,180</td>
+              <td class="num">—</td>
+              <td class="num">—</td>
             </tr>
-            <tr>
-              <td style="font-weight:600">ago-26</td>
-              <td class="num">17.0427</td>
-              <td class="num">9</td>
-              <td class="num">1,110</td>
+<tr>
+              <td>ago-26</td><td class="num">$17.0427</td>
+              <td class="num">9</td><td class="num">1,110.2</td>
               <td class="num">$39,948</td>
-              <td class="num">$522,835</td>
-              <td class="num">$492,779</td>
-              <td class="num">$9,270</td>
+              <td class="num">—</td>
+              <td class="num">—</td>
             </tr>
+
+            <!-- HIST_ROWS_END -->
           </tbody>
         </table>
       </div>
@@ -767,42 +737,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="7" style="background:var(--bg-page);font-weight:700;font-size:.67rem;color:var(--c1);padding:8px 8px 4px;text-transform:uppercase;letter-spacing:.05em">Cierre jul-26</td></tr>
-            <tr><td style="font-size:.72rem">SW NORTH AMERICA, INC</td><td class="num">6</td><td class="num">523.5</td><td class="num">$17,263</td><td class="num">$299,611</td><td class="num">$296,950</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">MATUK LLC</td><td class="num">3</td><td class="num">576</td><td class="num">$21,080</td><td class="num">$206,539</td><td class="num">$204,687</td><td class="num">$9,180</td></tr>
-            <tr><td style="font-size:.72rem">GENERAL MOTORS MX</td><td class="num">2</td><td class="num">206.5</td><td class="num">$6,625</td><td class="num">$114,985</td><td class="num">$107,521</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">PARI</td><td class="num">1</td><td class="num">185</td><td class="num">$6,475</td><td class="num">$112,381</td><td class="num">$100,836</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">ATS LIFE SCIENCE</td><td class="num">1</td><td class="num">111.75</td><td class="num">$3,129</td><td class="num">$54,308</td><td class="num">$53,722</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">MEHNERT USA, LLC.</td><td class="num">1</td><td class="num">74</td><td class="num">$2,368</td><td class="num">$41,099</td><td class="num">$36,877</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">MOVEATECH</td><td class="num">1</td><td class="num">58</td><td class="num">$3,364</td><td class="num">$58,386</td><td class="num">$47,984</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">HALSTON SOFTWARE</td><td class="num">1</td><td class="num">80</td><td class="num">$2,160</td><td class="num">$37,489</td><td class="num">$37,085</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">COMAU AUTOMATIZACION</td><td class="num">1</td><td class="num">43.5</td><td class="num">$1,001</td><td class="num">$17,365</td><td class="num">$15,581</td><td class="num">&mdash;</td></tr>
-            <tr class="row-highlight">
-              <td><strong>TOTAL jul-26</strong></td>
-              <td class="num bold">17</td>
-              <td class="num bold">1,858.25</td>
-              <td class="num bold">$63,464</td>
-              <td class="num bold">$942,164</td>
-              <td class="num bold">$901,245</td>
-              <td class="num bold">$9,180</td>
+            <!-- DETALLE_ROWS_START -->
+<tr class="group-header"><td colspan="7">ago-26</td></tr>
+<tr>
+              <td>754727.154310345</td>
+              <td class="num">120756</td>
+              <td class="num">40,983.7</td>
+              <td class="num">$8,699</td>
+              <td class="num">—</td>
+              <td class="num">$825,800</td>
+              <td class="num">$12,870</td>
             </tr>
-            <tr><td colspan="7" style="background:var(--bg-page);font-weight:700;font-size:.67rem;color:var(--c2);padding:8px 8px 4px;text-transform:uppercase;letter-spacing:.05em">Cierre ago-26</td></tr>
-            <tr><td style="font-size:.72rem">MATUK LLC</td><td class="num">3</td><td class="num">503</td><td class="num">$18,865</td><td class="num">$163,525</td><td class="num">$162,130</td><td class="num">$9,270</td></tr>
-            <tr><td style="font-size:.72rem">GENERAL MOTORS MX</td><td class="num">3</td><td class="num">170</td><td class="num">$5,675</td><td class="num">$96,717</td><td class="num">$89,720</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">GENERAL MOTORS LLC</td><td class="num">1</td><td class="num">95</td><td class="num">$3,800</td><td class="num">$64,762</td><td class="num">$58,109</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">SW NORTH AMERICA, INC</td><td class="num">1</td><td class="num">98.5</td><td class="num">$3,645</td><td class="num">$62,112</td><td class="num">$55,731</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">ATS LIFE SCIENCE</td><td class="num">1</td><td class="num">113</td><td class="num">$3,390</td><td class="num">$57,775</td><td class="num">$57,152</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">ZT GROUP</td><td class="num">1</td><td class="num">88.67</td><td class="num">$3,103</td><td class="num">$52,891</td><td class="num">$47,458</td><td class="num">&mdash;</td></tr>
-            <tr><td style="font-size:.72rem">PARI</td><td class="num">1</td><td class="num">42</td><td class="num">$1,470</td><td class="num">$25,053</td><td class="num">$22,479</td><td class="num">&mdash;</td></tr>
-            <tr class="row-highlight">
-              <td><strong>TOTAL ago-26</strong></td>
-              <td class="num bold">9</td>
-              <td class="num bold">1,110.17</td>
-              <td class="num bold">$39,948</td>
-              <td class="num bold">$522,835</td>
-              <td class="num bold">$492,779</td>
-              <td class="num bold">$9,270</td>
-            </tr>
+
+            <!-- DETALLE_ROWS_END -->
           </tbody>
         </table>
       </div>
@@ -818,87 +765,54 @@
     <span style="font-weight:400;color:var(--text-3)">(vi&aacute;ticos facturados por cliente)</span>
   </p>
 
-  <div class="kpi-grid" style="margin-bottom:22px">
-    <div class="kpi-card c5">
-      <div class="kpi-label">Mes Cerrado</div>
-      <div class="kpi-value">sep-26</div>
-      <div class="kpi-sub">vi&aacute;ticos congelados</div>
-      <span class="kpi-icon">&#128197;</span>
-    </div>
-    <div class="kpi-card c6">
-      <div class="kpi-label">TC de Cierre</div>
-      <div class="kpi-value" style="font-size:1.3rem">17.0427</div>
-      <div class="kpi-sub">MXN / USD</div>
-      <span class="kpi-icon">&#128178;</span>
-    </div>
-    <div class="kpi-card c2">
-      <div class="kpi-label">Personas</div>
-      <div class="kpi-value">32</div>
-      <div class="kpi-sub">con vi&aacute;ticos</div>
-      <span class="kpi-icon">&#128101;</span>
-    </div>
-    <div class="kpi-card c1">
-      <div class="kpi-label">D&iacute;as</div>
-      <div class="kpi-value">526</div>
-      <div class="kpi-sub">d&iacute;as facturados</div>
-      <span class="kpi-icon">&#128340;</span>
-    </div>
-    <div class="kpi-card c3">
-      <div class="kpi-label">Total USD</div>
-      <div class="kpi-value">$71,645</div>
-      <div class="kpi-sub">vi&aacute;ticos cobrados</div>
-      <span class="kpi-icon">&#128181;</span>
-    </div>
-    <div class="kpi-card c5">
-      <div class="kpi-label">Total MXN c/IVA</div>
-      <div class="kpi-value" style="font-size:1.15rem">$1,221,024</div>
-      <div class="kpi-sub">monto bruto facturado</div>
-      <span class="kpi-icon">&#128176;</span>
-    </div>
-    <div class="kpi-card c4">
-      <div class="kpi-label">Neto MXN</div>
-      <div class="kpi-value" style="font-size:1.2rem">$1,190,923</div>
-      <div class="kpi-sub">neto cobrado</div>
-      <span class="kpi-icon">&#128176;</span>
-    </div>
-  </div>
+  <!-- VIATICOS_START -->
+<div class="kpi-grid">
+  <div class="kpi-card"><span class="kpi-val">$71.6K</span><span class="kpi-label">Total USD</span><span class="kpi-sub">viáticos acumulados</span></div>
+  <div class="kpi-card"><span class="kpi-val">$1.22M</span><span class="kpi-label">Total MXN</span><span class="kpi-sub">sin IVA</span></div>
+  <div class="kpi-card"><span class="kpi-val">$1.42M</span><span class="kpi-label">Total MXN c/IVA</span><span class="kpi-sub">+16% IVA</span></div>
+  <div class="kpi-card"><span class="kpi-val">$1.19M</span><span class="kpi-label">Neto MXN</span><span class="kpi-sub">después retención</span></div>
+</div>
+<div class="table-wrap" style="margin-top:1rem"><table class="data-table"><thead><tr><th>Mes Cierre</th><th>Cliente</th><th class="num">Pers.</th><th class="num">Días</th><th class="num">Total USD</th><th class="num">Total MXN</th><th class="num">Neto MXN</th></tr></thead><tbody>
+<tr><td>sep-26</td><td>17.0427</td>
+              <td class="num">32</td><td class="num">526</td>
+              <td class="num">$71,645</td>
+              <td class="num">$1,221,024</td>
+              <td class="num">$1,190,923</td></tr>
+<tr><td>sep-26</td><td>ATS LIFE SCIENCES</td>
+              <td class="num">9</td><td class="num">138</td>
+              <td class="num">$6,900</td>
+              <td class="num">$117,595</td>
+              <td class="num">$116,961</td></tr>
+<tr><td>sep-26</td><td>COMAU MX</td>
+              <td class="num">2</td><td class="num">54</td>
+              <td class="num">$6,150</td>
+              <td class="num">$104,813</td>
+              <td class="num">$104,813</td></tr>
+<tr><td>sep-26</td><td>GENERAL MOTORS MX</td>
+              <td class="num">6</td><td class="num">42</td>
+              <td class="num">$4,620</td>
+              <td class="num">$78,737</td>
+              <td class="num">$74,552</td></tr>
+<tr><td>sep-26</td><td>MATUK LLC</td>
+              <td class="num">4</td><td class="num">79</td>
+              <td class="num">$14,765</td>
+              <td class="num">$251,635</td>
+              <td class="num">$249,250</td></tr>
+<tr><td>sep-26</td><td>SW NORTH AMERICA</td>
+              <td class="num">10</td><td class="num">198</td>
+              <td class="num">$38,460</td>
+              <td class="num">$655,462</td>
+              <td class="num">$633,879</td></tr>
+<tr><td>sep-26</td><td>ZT GROUP</td>
+              <td class="num">1</td><td class="num">15</td>
+              <td class="num">$750</td>
+              <td class="num">$12,782</td>
+              <td class="num">$11,469</td></tr>
+</tbody></table></div>
 
-  <div class="card" style="max-width:700px">
-    <div class="card-title">Detalle Vi&aacute;ticos por Cliente — Sep 2026</div>
-    <div class="card-sub">Pasivo de vi&aacute;ticos congelado y facturado</div>
-    <div style="overflow-x:auto;margin-top:10px">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th class="num">Pers.</th>
-            <th class="num">D&iacute;as</th>
-            <th class="num">Total USD</th>
-            <th class="num">Total MXN</th>
-            <th class="num">Neto MXN</th>
-            <th class="num">%</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td style="font-size:.72rem">SW NORTH AMERICA</td><td class="num">10</td><td class="num">198</td><td class="num">$38,460</td><td class="num">$655,462</td><td class="num">$633,879</td><td class="num">53.7%</td></tr>
-          <tr><td style="font-size:.72rem">MATUK LLC</td><td class="num">4</td><td class="num">79</td><td class="num">$14,765</td><td class="num">$251,635</td><td class="num">$249,250</td><td class="num">20.6%</td></tr>
-          <tr><td style="font-size:.72rem">ATS LIFE SCIENCES</td><td class="num">9</td><td class="num">138</td><td class="num">$6,900</td><td class="num">$117,595</td><td class="num">$116,961</td><td class="num">9.6%</td></tr>
-          <tr><td style="font-size:.72rem">COMAU MX</td><td class="num">2</td><td class="num">54</td><td class="num">$6,150</td><td class="num">$104,813</td><td class="num">$104,813</td><td class="num">8.6%</td></tr>
-          <tr><td style="font-size:.72rem">GENERAL MOTORS MX</td><td class="num">6</td><td class="num">42</td><td class="num">$4,620</td><td class="num">$78,737</td><td class="num">$74,552</td><td class="num">6.4%</td></tr>
-          <tr><td style="font-size:.72rem">ZT GROUP</td><td class="num">1</td><td class="num">15</td><td class="num">$750</td><td class="num">$12,782</td><td class="num">$11,469</td><td class="num">1.0%</td></tr>
-          <tr class="row-highlight">
-            <td><strong>TOTAL</strong></td>
-            <td class="num bold">32</td>
-            <td class="num bold">526</td>
-            <td class="num bold">$71,645</td>
-            <td class="num bold">$1,221,024</td>
-            <td class="num bold">$1,190,923</td>
-            <td class="num bold">100%</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+            <!-- VIATICOS_END -->
+
+
 
 </main><!-- /page -->
 
@@ -959,7 +873,7 @@ const clients = [
   { name:'INTEGRION', hrs:46.0, total:2344.83 },
   { name:'FORD', hrs:80.0, total:2275.86 },
   { name:'SIMASA', hrs:53.0, total:1644.0 },
-].sort((a,b)=>b.total-a.total);.sort((a,b)=>b.total-a.total);
+].sort((a,b)=>b.total-a.total);.sort((a,b)=>b.total-a.total);.sort((a,b)=>b.total-a.total);.sort((a,b)=>b.total-a.total);
 
 /* ── Per-month service data [hrs, costUSD] ───────────────────────────────── */
 const svcByMonth = {
