@@ -873,7 +873,7 @@ const clients = [
   { name:'INTEGRION', hrs:46.0, total:2344.83 },
   { name:'FORD', hrs:80.0, total:2275.86 },
   { name:'SIMASA', hrs:53.0, total:1644.0 },
-].sort((a,b)=>b.total-a.total);.sort((a,b)=>b.total-a.total);.sort((a,b)=>b.total-a.total);.sort((a,b)=>b.total-a.total);
+];.sort((a,b)=>b.total-a.total);.sort((a,b)=>b.total-a.total);
 
 /* ── Per-month service data [hrs, costUSD] ───────────────────────────────── */
 const svcByMonth = {
@@ -1336,7 +1336,7 @@ function updateClientSection(month) {
   chartClientBars.update('none');
 
   /* --- Client donut (top 5 by cost) --- */
-  const sortedByCost = [...cliRows].sort((a,b)=>b.total-a.total);
+  const sortedByCost = [...cliRows];
   const top5c  = sortedByCost.slice(0,5);
   const restC  = sortedByCost.slice(5).reduce((a,c)=>a+c.total, 0);
   chartClientDonut.data.labels = [...top5c.map(c=>c.name.split(' ').slice(0,2).join(' ')), 'Otros'];
